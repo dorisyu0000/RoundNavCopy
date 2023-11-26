@@ -1,0 +1,2 @@
+web: env FLASK_ENV=development env/bin/python bin/herokuapp.py
+bundle: npm run watch

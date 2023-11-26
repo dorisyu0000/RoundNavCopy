@@ -1,0 +1,26 @@
+{
+  "name": "graph-nav",
+  "version": "1.0.0",
+  "description": "Navigation experiments over graphs to characterize hierarchical structure in behavior.",
+  "source": "templates/exp.template.html",
+  "dependencies": {
+    "eslint": "^7.26.0",
+    "parcel": "^2.0.0-rc.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "parcel build --no-scope-hoist --public-url /dist",
+    "build_local": "parcel build --public-url /dist",
+    "watch": "parcel watch --public-url /dist --no-hmr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cgc/graph-nav.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cgc/graph-nav/issues"
+  },
+  "homepage": "https://github.com/cgc/graph-nav#readme"
+}
