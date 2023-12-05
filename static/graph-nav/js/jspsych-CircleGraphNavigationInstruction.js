@@ -59,7 +59,7 @@ addPlugin('intro', async function intro(root, trial) {
   cg.setCurrentState(trial.start)
   await button()
 
-  message(`You can move by clicking on a location that has an arrow pointing<br>from your current location. Try it now!`)
+  message(`You can move by pressing the key corresponded to the color of the arrow pointing<br>from your current location. Try it now! <br>Press the 1 for "🟥"; <br> Press the 2 for "🟦".`)
   let next_states = cg.graph.successors(trial.start)
   for (const s of next_states) {
     $(`.GraphNavigation-State-${s}`).addClass('GraphNavigation-State-Highlighted')
@@ -71,7 +71,7 @@ addPlugin('intro', async function intro(root, trial) {
 
   message(`
     The goal of the game is to earn points by collecting items from the board.<br>
-    Try collecting this item!
+    Try collecting this item! <br>Press the 1 for "🟥"; <br> Press the 2 for "🟦".
   `)
   let goal = _.sample(cg.graph.successors(cg.state))
   // $("#gn-points").show()
