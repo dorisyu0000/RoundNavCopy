@@ -21,6 +21,10 @@ export class CircleGraph {
       Object.assign(options, options.dynamicProperties());
     }
 
+    let gro = options.graphRenderOptions;
+    gro.successorKeysRender = gro.successorKeysRender || (key => key);
+    options.successorKeys = ['1','2','3','4']
+
     this.options = options;
     options.consume = options.consume ?? true
     options.edgeShow = options.edgeShow ?? (() => true);
@@ -167,9 +171,6 @@ export class CircleGraph {
         for (const pred of this.graph.predecessors(state)) {
           $(`.GraphNavigation-edge-${pred}-${state}`).addClass('is-visible')
         }
-        // 悬停断点
-        console.log(`鼠标悬停在状态 ${state}`);
-
       });
       el.addEventListener('mouseleave', (e) => {
         this.logger('mouseleave', { state })
@@ -183,14 +184,21 @@ export class CircleGraph {
       });
     }
   }
-  // Update -- 更新内容
-  // 获取键盘的数字去选择
+  // Update
+  // keyResponse for choose
   async getKeyResponse() {
     return new Promise((resolve) => {
         const keyHandler = (info) => {
-            const key = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(info.key);
-            if (key >= '1' && key <= '4') { 
+          const input_key = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(info.key);
+          let key; // Declare the 'key' variable
+          if (input_key == 'q' || input_key == '1') {
+               key = '1';
+           }
+          if (input_key == 'p' || input_key == '2') {
+               key = '2';
+           }
 
+            if (key >= '1' && key <= '4') { 
                 const index = parseInt(key, 10) - 1; 
                 const validSuccessors = this.graph.successors(this.state);
 
@@ -214,7 +222,7 @@ export class CircleGraph {
 }
 
 
-  // 提示吐司的方法
+  // Toast massage for invalid selection
   showToast(message) {
     const toast = $('<div>')
         .addClass('toast-message')
@@ -265,6 +273,41 @@ export class CircleGraph {
     });
   }
 
+
+  keyCodeToState(keyCode) {
+    /*
+    Mapping keyCode to states.
+    */
+    const key = String.fromCharCode(keyCode).toUpperCase();
+    const idx = this.options.successorKeys[this.state].indexOf(key);
+    if (idx === -1) {
+      return null;
+    }
+    const succ = this.options.graph.successors(this.state)[idx];
+    if (!this.options.edgeShow(this.state, succ)) {
+      return null;
+    }
+    return succ;
+  }
+
+  keyTransition() {
+    /*
+    Returns a promise that is resolved with {state} when there is a keypress
+    corresponding to a valid state transition.
+    */
+    const p = documentEventPromise('keydown', (e) => {
+      const state = this.keyCodeToState(e.keyCode);
+      if (state !== null) {
+        e.preventDefault();
+        return {state};
+      }
+    });
+
+    this.cancellables.push(p.cancel);
+
+    return p;
+  }
+
   clickTransition(options) {
     options = options || {};
     /*
@@ -281,7 +324,7 @@ export class CircleGraph {
         el.classList.add('PathIdentification-selectable');
       }
     }
-    console.log("点击了")
+    console.log("Click")
 
     return new Promise((resolve, reject) => {
       const handler = (e) => {
@@ -293,6 +336,7 @@ export class CircleGraph {
         const state = parseInt(el.getAttribute('data-state'), 10);
 
         this.el.removeEventListener('click', handler);
+        resolve({ state });
         resolve({ state });
       }
 
@@ -361,16 +405,17 @@ export class CircleGraph {
       const g = this.graph;
 
 
-      // Update -- 获取state，根据getKeyResponse
+
+
+      // Update -- get state based on getKeyResponse
       const { state } = await this.getKeyResponse();
 
-      // const {state} = await this.clickTransition({
-      //   invalidStates: new Set(
-      //     g.states.filter(s => !g.successors(this.state).includes(s))
-      //   ),
-      // });
-
-      // 给state赋值
+      // const {state} = await this.keyTransition()
+      // this.clickTransition({
+      // //   invalidStates: new Set(
+      // //     g.states.filter(s => !g.successors(this.state).includes(s))
+      // //   ),
+      // // });
       this.visitState(state)
       path.push(state)
 
@@ -390,6 +435,7 @@ export class CircleGraph {
           // $(this.el).empty()
         } else {
           await sleep(200)
+          $(this.el).animate({ opacity: 0 }, 200)
           $(this.el).animate({ opacity: 0 }, 200)
           await sleep(500)
         }
@@ -549,11 +595,13 @@ function renderCircleGraph(graph, gfx, goal, options) {
       style: `transform: translate(${x - BLOCK_SIZE / 2}px,${y - BLOCK_SIZE / 2}px);
       
       `,
+      style: `transform: translate(${x - BLOCK_SIZE / 2}px,${y - BLOCK_SIZE / 2}px);
+      
+      `,
     });
   });
 
-  // Update2 添加数据线的方法，由于我们已经在最上方定义了十个颜色的list，我们在创建addArrow
-  // 的时候去定义颜色，
+  // Update2 addArrow define color
   
 function addArrow(state, successor, norm, rot, color) {
     const [x, y] = xy.scaled[state];
@@ -588,6 +636,21 @@ function addArrow(state, successor, norm, rot, color) {
   window.states = states
   window.shadowStates = shadowStates
 
+  function addKey(key, state, successor, norm) {
+    const [x, y] = xy.scaled[state];
+    const [sx, sy] = xy.scaled[successor];
+    const [keyWidth, keyHeight] = [20, 28]; // HACK get from CSS
+    // We also add the key labels here
+    const mul = keyDistanceFactor * BLOCK_SIZE / 2;
+    keys.push(`
+      <div class="GraphNavigation-key GraphNavigation-key-${state}-${successor} GraphNavigation-key-${keyForCSSClass(key)}" style="
+        transform: translate(
+          ${x - keyWidth/2 + mul * (sx-x)/norm}px,
+          ${y - keyHeight/2 + mul * (sy-y)/norm}px)
+      ">${options.successorKeysRender(key)}</div>
+    `);
+  }
+
   const succ = [];
   const arrows = [];
 
@@ -597,7 +660,7 @@ function addArrow(state, successor, norm, rot, color) {
 
     successors.forEach((successor, idx) => {
         const e = xy.edge(state, successor);
-        const color = colors[idx % colors.length];  // 根据后继节点的索引选择颜色
+        const color = colors[idx % colors.length];  
 
         succ.push(`
           <div class="GraphNavigation-edge GraphNavigation-edge-${state}-${successor}" style="
@@ -635,6 +698,7 @@ function setCurrentState(display_element, graph, state, options) {
   options.edgeShow = options.edgeShow || (() => true);
   // showCurrentEdges enables rendering of current edges/keys. This is off for PathIdentification and AcceptReject.
   options.showCurrentEdges = typeof (options.showCurrentEdges) === 'undefined' ? true : options.showCurrentEdges;
+  options.showCurrentEdges = typeof (options.showCurrentEdges) === 'undefined' ? true : options.showCurrentEdges;
   const allKeys = _.unique(_.flatten(options.successorKeys));
 
   // Remove old classes!
@@ -653,6 +717,7 @@ function setCurrentState(display_element, graph, state, options) {
   }
 
   // Can call this to clcconear out current state too.
+  // Can call this to clcconear out current state too.
   if (state == null) {
     return;
   }
@@ -666,6 +731,7 @@ function setCurrentState(display_element, graph, state, options) {
 
   if (options.onlyShowCurrentEdges) {
     for (const el of display_element.querySelectorAll('.GraphNavigation-edge,.GraphNavigation-arrow')) {
+      // for (const el of display_element.querySelectorAll('.GraphNavigation-edge')) {
       // for (const el of display_element.querySelectorAll('.GraphNavigation-edge')) {
       el.style.opacity = 0;
     }

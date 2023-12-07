@@ -59,7 +59,7 @@ addPlugin('intro', async function intro(root, trial) {
   cg.setCurrentState(trial.start)
   await button()
 
-  message(`You can move by clicking on a location that has an arrow pointing<br>from your current location. Try it now!`)
+  message(`You can move by pressing keys to move from your current location.<br>Press “P" for 🟦 if you want to move in the direction of a blue arrow<br>or press "Q" for 🟥 if you want to move in the direction of a red arrow. Try it now!`)
   let next_states = cg.graph.successors(trial.start)
   for (const s of next_states) {
     $(`.GraphNavigation-State-${s}`).addClass('GraphNavigation-State-Highlighted')
@@ -72,6 +72,7 @@ addPlugin('intro', async function intro(root, trial) {
   message(`
     The goal of the game is to earn points by collecting items from the board.<br>
     Try collecting this item!
+    ${describeActions()} 
   `)
   let goal = _.sample(cg.graph.successors(cg.state))
   // $("#gn-points").show()
@@ -92,6 +93,7 @@ addPlugin('intro', async function intro(root, trial) {
 
   message(`
     Now try collecting this item.
+    ${describeActions()}
   `)
 
   goal = _.sample(cg.graph.successors(cg.state))
@@ -107,13 +109,13 @@ addPlugin('intro', async function intro(root, trial) {
 })
 
 
-function describeRewards(rewardGraphics) {
-  let vals = _.sortBy(_.without(_.keys(rewardGraphics), "0"), parseFloat)
-  let descriptions = vals.map(reward => {
-    return `${renderSmallEmoji(rewardGraphics[reward])}is worth ${reward}`
-  })
-  return descriptions.slice(0, -1).join(', ') + ', and ' + descriptions.slice(-1)
-}
+// function describeRewards(rewardGraphics) {
+//   let vals = _.sortBy(_.without(_.keys(rewardGraphics), "0"), parseFloat)
+//   let descriptions = vals.map(reward => {
+//     return `${renderSmallEmoji(rewardGraphics[reward])}is worth ${reward}`
+//   })
+//   return descriptions.slice(0, -1).join(', ') + ', and ' + descriptions.slice(-1)
+// }
 
 addPlugin('collect_all', async function collect_all(root, trial) {
   trial = {
@@ -360,3 +362,34 @@ addPlugin('text', async function text(root, trial) {
   $(root).empty()
   jsPsych.finishTrial({})
 })
+
+let ensureSign = x => x > 0 ? "+" + x : "" + x
+
+function describeRewards(rewardGraphics) {
+  let vals = _.sortBy(_.without(_.keys(rewardGraphics), "0"), parseFloat)
+  // let descriptions = vals.map(reward => {
+  //   return `${renderSmallEmoji(rewardGraphics[reward])}is worth ${reward}`
+  // })
+  // return descriptions.slice(0, -1).join(', ') + ', and ' + descriptions.slice(-1)
+  let vv =  vals.map(reward => `
+    <div class="describe-rewards-box">
+    ${renderSmallEmoji(rewardGraphics[reward])}<br>
+    ${ensureSign(reward)}
+    </div>
+  `).join("")
+  return `
+    <div class="describe-rewards">
+      ${vv}
+    </div>
+  `
+}
+
+
+function describeActions() {
+  return `
+    <div class="describe-actions">
+      <div class="describe-actions-box"> 🟥 Arrow: Pressing "Q" </div>
+      <div class="describe-actions-box"> 🟦 Arrow: Pressing "P" </div>
+    </div>
+  `
+}
