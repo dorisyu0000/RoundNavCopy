@@ -56,7 +56,7 @@ async function initializeExperiment() {
     width: 700,
     height: 600,
     scaleEdgeFactor: 1,
-    fixedXY: circleXY(10)
+    fixedXY: circleXY(config.trials.intro.graph.length)
   };
 
   function instruct_block(name) {
@@ -71,6 +71,8 @@ async function initializeExperiment() {
       ...config.trials[name],
     }
   }
+
+  
 
   function practice_block(name, message, options={}) {
     if (!_.has(config.trials, name)) throw new Error(`${name} not in config.trials`)
@@ -121,17 +123,18 @@ async function initializeExperiment() {
     practice_block('practice_revealed', `
       Great! Let's try a few more practice rounds.
     `),
-    instruct_block('intro_hover', {
-      hover_edges: true,
-      hover_rewards: params.hover_rewards,
-    }),
+    // instruct_block('intro_hover', {
+    //   hover_edges: true,
+    //   hover_rewards: params.hover_rewards,
+    // }),
     practice_block('practice_hover', `
       Try three more practice games. Then we can begin the main section<br>
       (where you can earn money!)
     `, {
-      hover_edges: true,
-      hover_rewards: params.hover_rewards,
+      hover_edges: false,
+      hover_rewards: false,
     }),
+
     text_block(`
       You've got it! Now you're ready to play the game for real.
       In the remaining ${config.trials.main.length} rounds, your
@@ -139,6 +142,7 @@ async function initializeExperiment() {
       <b>${bonus.describeScheme()}.</b> We'll start you off with ${bonus.initial}
       points for free. Good luck!
     `),
+    
     build_main(),
     {
       type: 'survey-text',

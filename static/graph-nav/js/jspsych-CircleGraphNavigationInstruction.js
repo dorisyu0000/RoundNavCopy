@@ -59,6 +59,7 @@ addPlugin('intro', async function intro(root, trial) {
   cg.setCurrentState(trial.start)
   await button()
 
+
   message(`You can move by pressing keys to move from your current location.<br>Press “P" for 🟦 if you want to move in the direction of a blue arrow<br>or press "Q" for 🟥 if you want to move in the direction of a red arrow. Try it now!`)
   let next_states = cg.graph.successors(trial.start)
   for (const s of next_states) {
@@ -109,10 +110,10 @@ addPlugin('intro', async function intro(root, trial) {
 })
 
 
-// function describeRewards(rewardGraphics) {
-//   let vals = _.sortBy(_.without(_.keys(rewardGraphics), "0"), parseFloat)
+// function describeRewards(emojiGraphics) {
+//   let vals = _.sortBy(_.without(_.keys(emojiGraphics), "0"), parseFloat)
 //   let descriptions = vals.map(reward => {
-//     return `${renderSmallEmoji(rewardGraphics[reward])}is worth ${reward}`
+//     return `${renderSmallEmoji(emojiGraphics[reward])}is worth ${reward}`
 //   })
 //   return descriptions.slice(0, -1).join(', ') + ', and ' + descriptions.slice(-1)
 // }
@@ -125,11 +126,12 @@ addPlugin('collect_all', async function collect_all(root, trial) {
   setup(root)
 
   message(`Each kind of item is worth a different number of points:<br>` +
-          describeRewards(trial.rewardGraphics))
+          describeRewards(trial.emojiGraphics))
   await button()
 
   message(`
     Try collecting all the items <b>(even the bad ones for now)</b>.
+    ${describeActions()}
   `)
   let cg = new CircleGraph($("#cgi-root"), trial);
   cg.showGraph(trial)
@@ -154,12 +156,15 @@ addPlugin('learn_rewards', async function learn_rewards(root, info) {
 
   for (let trial_set of info.trial_sets) {
     if (first) {
-      message(`Lets try a few easy ones. Try to collect the best item!`)
+      message(`Lets try a few easy ones. Try to collect the best item!
+        Remeember: ${describeActions()}
+      `)
       first = false
     } else {
       message(`
         Hmm... You didn't always collect the best item. Let's try again.<br>
-        Remember: ${describeRewards(info.rewardGraphics)}
+        Remember: ${describeRewards(info.emojiGraphics)} <br>
+        Also: ${describeActions()}
       `)
       await button()
       message(`Try to collect the best item! We'll continue when you always pick the best one.`)
@@ -365,15 +370,15 @@ addPlugin('text', async function text(root, trial) {
 
 let ensureSign = x => x > 0 ? "+" + x : "" + x
 
-function describeRewards(rewardGraphics) {
-  let vals = _.sortBy(_.without(_.keys(rewardGraphics), "0"), parseFloat)
+function describeRewards(emojiGraphics) {
+  let vals = _.sortBy(_.without(_.keys(emojiGraphics), "0"), parseFloat)
   // let descriptions = vals.map(reward => {
-  //   return `${renderSmallEmoji(rewardGraphics[reward])}is worth ${reward}`
+  //   return `${renderSmallEmoji(emojiGraphics[reward])}is worth ${reward}`
   // })
   // return descriptions.slice(0, -1).join(', ') + ', and ' + descriptions.slice(-1)
   let vv =  vals.map(reward => `
     <div class="describe-rewards-box">
-    ${renderSmallEmoji(rewardGraphics[reward])}<br>
+    ${renderSmallEmoji(emojiGraphics[reward])}
     ${ensureSign(reward)}
     </div>
   `).join("")
