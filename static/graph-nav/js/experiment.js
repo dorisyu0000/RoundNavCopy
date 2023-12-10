@@ -45,6 +45,8 @@ async function initializeExperiment() {
 
   window.config = config
   const params = config.parameters
+  // const session = config.session
+  // params = session.parameters
   params.show_points = false
   params.hover_rewards = true
   params.hover_edges = true
@@ -72,7 +74,7 @@ async function initializeExperiment() {
     }
   }
 
-  
+
 
   function practice_block(name, message, options={}) {
     if (!_.has(config.trials, name)) throw new Error(`${name} not in config.trials`)
@@ -86,6 +88,10 @@ async function initializeExperiment() {
       message,
       timeline: config.trials[name],
     }
+  }
+
+  function break_block(name, message) {
+
   }
 
   function text_block(message) {
