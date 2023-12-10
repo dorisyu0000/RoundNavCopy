@@ -73,7 +73,6 @@ addPlugin('intro', async function intro(root, trial) {
   message(`
     The goal of the game is to earn points by collecting items from the board.<br>
     Try collecting this item!
-    ${describeActions()} 
   `)
   let goal = _.sample(cg.graph.successors(cg.state))
   // $("#gn-points").show()
