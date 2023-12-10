@@ -398,15 +398,3 @@ function describeActions() {
   `
 }
 
-addPlugin('break', trialErrorHandling(async function breakTrial(root, trial) {
-  $(root).html(`
-    <div class="GraphNavigation">
-      <div class="GraphNavigation-break">
-        <p>Take a break! Press spacebar to continue.</p>
-      </div>
-    </div>
-  `);
-  await waitForSpace();
-  $(root).empty();
-  jsPsych.finishTrial();
-}));

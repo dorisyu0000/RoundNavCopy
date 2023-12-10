@@ -1,6 +1,9 @@
 
 import { numString, markdown, makePromise, parseHTML, trialErrorHandling, graphicsUrl, sleep, addPlugin, documentEventPromise, invariant, makeButton } from './utils.js';
 import { Graph } from './graphs.js';
+
+import { numString, markdown, makePromise, parseHTML, trialErrorHandling, graphicsUrl, sleep, addPlugin, documentEventPromise, invariant, makeButton } from './utils.js';
+import { Graph } from './graphs.js';
 import _ from '../../lib/underscore-min.js';
 import $ from '../../lib/jquery-min.js';
 import jsPsych from '../../lib/jspsych-exported.js';
@@ -10,7 +13,6 @@ const BLOCK_SIZE = 100;
 window.$ = $
 const colors = ["#E57373", "#64B5F6", "#81C784", "#FFF176"]; 
 
-<<<<<<< HEAD
 
 // descirbe the graph
 /**
@@ -36,8 +38,6 @@ const colors = ["#E57373", "#64B5F6", "#81C784", "#FFF176"];
  * @property {function} onStateVisit - Callback for state visit.
  * @property {function} dynamicProperties - Dynamic properties.
  */
-=======
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
 
 export class CircleGraph {
   constructor(root, options) {
@@ -199,9 +199,6 @@ export class CircleGraph {
         for (const pred of this.graph.predecessors(state)) {
           $(`.GraphNavigation-edge-${pred}-${state}`).addClass('is-visible')
         }
-        // log show state
-        console.log(`States ${state}`);
-
       });
       el.addEventListener('mouseleave', (e) => {
         this.logger('mouseleave', { state })
@@ -216,7 +213,6 @@ export class CircleGraph {
     }
   }
 
-<<<<<<< HEAD
   // Update
   // keyResponse for choose
   async getKeyResponse() {
@@ -234,15 +230,6 @@ export class CircleGraph {
                 key = '4';}
 
           if (key >= '1' && key <= '4') { 
-=======
-  // Key response
-  async getKeyResponse() {
-    return new Promise((resolve) => {
-        const keyHandler = (info) => {
-            const key = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(info.key);
-            if (key >= '1' && key <= '4') { 
-
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
                 const index = parseInt(key, 10) - 1; 
                 const validSuccessors = this.graph.successors(this.state);
 
@@ -266,11 +253,7 @@ export class CircleGraph {
 }
 
 
-<<<<<<< HEAD
   // Toast massage for invalid selection
-=======
-  // Toast message
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
   showToast(message) {
     const toast = $('<div>')
         .addClass('toast-message')
@@ -385,10 +368,7 @@ export class CircleGraph {
 
         this.el.removeEventListener('click', handler);
         resolve({ state });
-<<<<<<< HEAD
         resolve({ state });
-=======
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
       }
 
       this.el.addEventListener('click', handler);
@@ -456,7 +436,6 @@ export class CircleGraph {
       const g = this.graph;
 
 
-<<<<<<< HEAD
 
 
       // Update -- get state based on getKeyResponse
@@ -468,18 +447,6 @@ export class CircleGraph {
       // //     g.states.filter(s => !g.successors(this.state).includes(s))
       // //   ),
       // // });
-=======
-      // Update -- get state accroding to getKeyResponse
-      const { state } = await this.getKeyResponse();
-
-      // const {state} = await this.clickTransition({
-      //   invalidStates: new Set(
-      //     g.states.filter(s => !g.successors(this.state).includes(s))
-      //   ),
-      // });
-
-      // Update -- add score
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
       this.visitState(state)
       path.push(state)
 
@@ -500,10 +467,7 @@ export class CircleGraph {
         } else {
           await sleep(200)
           $(this.el).animate({ opacity: 0 }, 200)
-<<<<<<< HEAD
           $(this.el).animate({ opacity: 0 }, 200)
-=======
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
           await sleep(500)
         }
         // $(this.el).addClass('.GraphNavigation-terminated')
@@ -662,7 +626,6 @@ function renderCircleGraph(graph, gfx, goal, options) {
       style: `transform: translate(${x - BLOCK_SIZE / 2}px,${y - BLOCK_SIZE / 2}px);
       
       `,
-<<<<<<< HEAD
       style: `transform: translate(${x - BLOCK_SIZE / 2}px,${y - BLOCK_SIZE / 2}px);
       
       `,
@@ -670,12 +633,6 @@ function renderCircleGraph(graph, gfx, goal, options) {
   });
 
 // Update2 addArrow define color
-=======
-    });
-  });
-
-// Update2 addArrow function
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
 function addArrow(state, successor, norm, rot, color) {
     const [x, y] = xy.scaled[state];
     const [sx, sy] = xy.scaled[successor];
@@ -686,24 +643,14 @@ function addArrow(state, successor, norm, rot, color) {
       transform:
         translate(${sx - 35}px, ${sy - 35}px)
         rotate(${rot}rad)
-<<<<<<< HEAD
         translate(-30px)
-=======
-        translate(30px) 
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
         rotate(90deg)
       ;">
       <svg height="70" width="70" style="display: block; ">
           <polygon points="
-<<<<<<< HEAD
           35  , 38
           29  , 50
           41 , 50
-=======
-          35  , 38  
-          29  , 50
-          41 , 50 
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
         " class="triangle" style="fill: ${color};" /> 
       </svg>
       </div>
@@ -743,11 +690,7 @@ function addArrow(state, successor, norm, rot, color) {
 
     successors.forEach((successor, idx) => {
         const e = xy.edge(state, successor);
-<<<<<<< HEAD
         const color = colors[idx % colors.length];  
-=======
-        const color = colors[idx % colors.length];  // 根据后继节点的索引选择颜色
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
 
         succ.push(`
           <div class="GraphNavigation-edge GraphNavigation-edge-${state}-${successor}" style="
@@ -785,10 +728,7 @@ function setCurrentState(display_element, graph, state, options) {
   options.edgeShow = options.edgeShow || (() => true);
   // showCurrentEdges enables rendering of current edges/keys. This is off for PathIdentification and AcceptReject.
   options.showCurrentEdges = typeof (options.showCurrentEdges) === 'undefined' ? true : options.showCurrentEdges;
-<<<<<<< HEAD
   options.showCurrentEdges = typeof (options.showCurrentEdges) === 'undefined' ? true : options.showCurrentEdges;
-=======
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
   const allKeys = _.unique(_.flatten(options.successorKeys));
 
   // Remove old classes!
@@ -807,10 +747,7 @@ function setCurrentState(display_element, graph, state, options) {
   }
 
   // Can call this to clcconear out current state too.
-<<<<<<< HEAD
   // Can call this to clcconear out current state too.
-=======
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
   if (state == null) {
     return;
   }
@@ -825,10 +762,7 @@ function setCurrentState(display_element, graph, state, options) {
   if (options.onlyShowCurrentEdges) {
     for (const el of display_element.querySelectorAll('.GraphNavigation-edge,.GraphNavigation-arrow')) {
       // for (const el of display_element.querySelectorAll('.GraphNavigation-edge')) {
-<<<<<<< HEAD
       // for (const el of display_element.querySelectorAll('.GraphNavigation-edge')) {
-=======
->>>>>>> 75184fa1269896f0bfb97666fc02b0313fbe0246
       el.style.opacity = 0;
     }
   }
@@ -886,4 +820,17 @@ addPlugin('main', trialErrorHandling(async function main(root, trial) {
   console.log('cg.data', cg.data);
   $(root).empty()
   jsPsych.finishTrial(cg.data)
+}));
+
+addPlugin('break', trialErrorHandling(async function breakTrial(root, trial) {
+  $(root).html(`
+    <div class="GraphNavigation">
+      <div class="GraphNavigation-break">
+        <p>Take a break! Press spacebar to continue.</p>
+      </div>
+    </div>
+  `);
+  await waitForSpace();
+  $(root).empty();
+  jsPsych.finishTrial();
 }));
