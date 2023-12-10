@@ -90,9 +90,7 @@ async function initializeExperiment() {
     }
   }
 
-  function break_block(name, message) {
 
-  }
 
   function text_block(message) {
     return {
@@ -113,6 +111,7 @@ async function initializeExperiment() {
 
   var timeline = [
     // instruct_block('test'),
+    instruct_block('break'),
     instruct_block('intro'),
     instruct_block('collect_all'),
     instruct_block('learn_rewards'),
