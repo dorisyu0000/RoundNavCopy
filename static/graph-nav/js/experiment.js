@@ -36,6 +36,7 @@ async function initializeExperiment() {
   psiturk.recordUnstructuredData('start_time', new Date());
 
   const config = await $.getJSON(`static/json/config/${CONDITION+1}.json`);
+  //const config = await $.getJSON(`static/json/test_trial.json`);
   config.trials.test = {
     "graph":[[1, 2], [3, 4], [5, 6], [7], [], [], [], []],
     "rewards":[5,5,5,5,5,5,5,5],
@@ -48,8 +49,8 @@ async function initializeExperiment() {
   // const session = config.session
   // params = session.parameters
   params.show_points = false
-  params.hover_rewards = true
-  params.hover_edges = true
+  params.hover_rewards = false
+  params.hover_edges = false
 
   const bonus = new Bonus({points_per_cent: params.points_per_cent, initial: 50})
 
