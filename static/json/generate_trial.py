@@ -7,6 +7,12 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy.stats import rv_discrete
 
+# Create a Python dictionary with None as a value
+data = {
+    'key': None
+}
+
+
 def regular_tree(branching):
     """
     Generates a regular tree where each level has a specified number of branches.
@@ -114,15 +120,17 @@ def sample_graph(n,base=None):
     start = perm.index(0)
     return graph, perm, start
 
-def sample_problem_1(n, n_steps=-1, rdist=None, rewards=None, graph=None, start=None):
+def sample_problem_1(n, trialNumber = None, n_steps=-1, rdist=None, rewards=None, graph=None, start=None):
     if graph is None:
-        graph, perm, start = sample_graph(n,base = [[1, 2], [3, 4],[5],[],[],[],[],[],[],[]])
+        graph, perm, start = sample_graph(n,base = [[1, 2], [3, 4],[5],[],[],[],[7,8],[8,9],[],[]])
     else:
         perm = list(range(n))
     if rewards is None and rdist is not None:
         all_rewards = rdist.rand()
+    if trialNumber is None:
+        trialNumber = 0
 
-    # rewards = sample_requirement(rewards, graph, start, rdist)
+    all_rewards = sample_requirement(all_rewards, graph, start, rdist)
 
     # all_rewards = [0] * n
     #  # Assign rewards to non-leaf nodes, excluding the start node
@@ -136,21 +144,24 @@ def sample_problem_1(n, n_steps=-1, rdist=None, rewards=None, graph=None, start=
     # # Distribute rewards among non-leaf, non-start nodes
     # for rewards, node in zip(rewards, non_leaf_nodes):
     #     all_rewards[node] = rewards
-    return {'graph': graph, 'rewards': all_rewards, 'start': start, 'n_steps': n_steps}
+    return {'graph': graph, 'rewards': all_rewards, 'start': start, 'n_steps': n_steps, 'trialNumber': trialNumber}
 
-def sample_problem_2(n, n_steps=-1, rdist=None, rewards=None, graph=None, start=None):
+def sample_problem_2(n, trialNumber = None, n_steps=-1, rdist=None, rewards=None, graph=None, start=None):
     """
     Sample a problem with n nodes and rewards given by rdist.
     Rewards are assigned only to non-leaf, non-start nodes.
     """
     if graph is None:
-        graph, perm, start = sample_graph(n,base = [[1, 2], [3, 4],[5,6],[],[],[],[],[],[],[]])
+        graph, perm, start = sample_graph(n,base = [[1, 2],[3, 4],[5,6],[],[],[],[],[8,9],[9],[]])
     else:
         perm = list(range(n))
     if rewards is None and rdist is not None:
         all_rewards = rdist.rand()
-    # rewards = sample_requirement(rewards, graph, start, rdist)
-    all_rewards = [0] * n
+    if trialNumber is None:
+        trialNumber = 0
+
+    all_rewards = sample_requirement(all_rewards, graph, start, rdist)
+    # all_rewards = [0] * n
     # # Assign rewards to non-leaf nodes, excluding the start node
     # non_leaf_nodes = set()
     # for node, children in enumerate(graph):
@@ -162,9 +173,33 @@ def sample_problem_2(n, n_steps=-1, rdist=None, rewards=None, graph=None, start=
     # for reward, node in zip(rewards, non_leaf_nodes):
     #     all_rewards[node] = reward
 
-    return {'graph': graph, 'rewards': all_rewards, 'start': start, 'n_steps': n_steps}
+    return {'graph': graph, 'rewards': all_rewards, 'start': start, 'n_steps': n_steps, 'trialNumber': trialNumber}
 
+def sample_practice(n, trialNumber = None, n_steps=-1, rdist=None, rewards=None, graph=None, start=None):
+    if graph is None:
+        graph, perm, start = sample_graph(n)
+    else:
+        perm = list(range(n))
+    if rewards is None and rdist is not None:
+        rewards = rdist.rand()
+    if trialNumber is None:
+        trialNumber = 0
 
+    # rewards = sample_requirement(rewards, graph, start, rdist)
+
+    all_rewards = [None] * n
+     # Assign rewards to non-leaf nodes, excluding the start node
+    non_leaf_nodes = set()
+    for node, children in enumerate(graph):
+        if children and node != start:  # Exclude start node
+            non_leaf_nodes.add(node)
+        for child in children:
+            if child != start:  # Exclude start node
+                non_leaf_nodes.add(child)
+    # Distribute rewards among non-leaf, non-start nodes
+    for rewards, node in zip(rewards, non_leaf_nodes):
+        all_rewards[node] = rewards
+    return {'graph': graph, 'rewards': all_rewards, 'start': start, 'n_steps': n_steps, 'trialNumber': trialNumber}
 
 
 def learn_reward(n, n_steps=1, rdist=None, rewards=None, graph=None, start=None):
@@ -178,10 +213,13 @@ def learn_reward(n, n_steps=1, rdist=None, rewards=None, graph=None, start=None)
         perm = list(range(n))  # No permutation if graph is already given
 
     if rewards is None and rdist is not None:
-        rewards = rdist.rand()
+        while True:
+            rewards = rdist.rand()
+            if rewards[0] != rewards[1]:
+                break
 
-    # Initialize all rewards to 0
-    all_rewards = [0] * n
+    # Initialize all rewards to None
+    all_rewards = [None] * n
 
     # Assign rewards to the first two children of the start node
     if len(graph[start]) >= 2:
@@ -249,9 +287,9 @@ def intro_problem(n, n_steps=-1, rdist=None, rewards=None, graph=None, start=Non
         if rdist is not None:
             rewards = rdist.rand()
         else:
-            rewards = [0] * n  # Default to a list of zeros
+            rewards = [None] * n  # Default to a list of zeros
     if len(rewards) < n:
-        rewards.extend([0] * (n - len(rewards)))
+        rewards.extend([None] * (n - len(rewards)))
     elif len(rewards) > n:
         rewards = rewards[:n]  
     random.shuffle(rewards)
@@ -259,58 +297,60 @@ def intro_problem(n, n_steps=-1, rdist=None, rewards=None, graph=None, start=Non
 
 def make_trials():
     n = 10
-    rewards = linear_rewards(6)
+    rewards = [1, 2, 0, -1, -2]
     rdist = IIDSampler(n, rewards) 
     kws = {'n': n, 'rdist': rdist}
     trial_sets = []
 
-    for _ in range(6):
+    for _ in range(10):
         problem = learn_reward(**kws)
         trial_sets.append(problem)  
         
     main = [] 
-    # problem_1 = sample_problem_1(**kws)  
-    # problem_2 = sample_problem_2(**kws)
-    # main.append(problem_1)
-    # main.append(problem_2)
+    problem_1 = sample_problem_1(**kws)  
+    problem_2 = sample_problem_2(**kws)
+    main.append(problem_1)
+    main.append(problem_2)
+    trialNumber = 1
 
-    for _ in range(20):
+    for _ in range(30):
         n = 10
         rdist = IIDSampler(n, rewards)
-        problem = sample_problem_1(n, rdist=rdist)   
+        problem = sample_problem_1(n,trialNumber, rdist=rdist) 
+        trialNumber += 1  
         main.append(problem)
 
-    for _ in range(20):
+    for _ in range(30):
         n = 10
         rdist = IIDSampler(n, rewards)
-        problem = sample_problem_2(n, rdist=rdist)   
+        problem = sample_problem_2(n,trialNumber, rdist=rdist)   
+        trialNumber += 1 
         main.append(problem)
 
     learn_rewards = {'trial_sets': [trial_sets]}
+    practice = sample_practice(**kws)
     practice_revealed = [sample_problem(**kws)]
     intro_hover = sample_problem(**kws)
     practice_hover = [sample_problem(**kws)]
-    intro = intro_problem(**kws, rewards=[0] * n)
-    collect_all = intro_problem(**kws, rewards=rewards)
+    intro = intro_problem(**kws, rewards=[None] * n)
+    collect_all = intro_problem(**kws, rewards= [1, 2, 0, -1, -2, 1, 2, 0, -1, -2])
     
 
     return {
         'intro': intro,
         'collect_all': collect_all,
         'learn_rewards': learn_rewards,
-        'practice_revealed': practice_revealed,
-        'intro_hover': intro_hover,
-        'practice_hover': practice_hover,
+        'practice': practice,
         'main': main
     }
     
 
-def reward_contours(n=6):
-    png = ["pattern_2", "pattern_3", "pattern_4", "pattern_5", "pattern_6", "pattern_7"]
+def reward_contours(n=5):
+    png = ["pattern_1", "pattern_3", "pattern_5", "pattern_7", "pattern_9"]
     if len(png) < n:
         png.extend(["pattern_default"] * (n - len(png)))
 
-    return dict(zip(linear_rewards(n), png))
+    return dict(zip([-2,-1,0,1,2], png))
 from random import sample
 
 def reward_graphics(n,rewards):
@@ -343,9 +383,9 @@ for i, trials in enumerate(subj_trials, start=1):
         json.dump({"parameters": parameters, "trials": trials}, file, ensure_ascii=False)
 
 n = 10
-rewards = [-1,-2,-3, 1, 2, 3]
+rewards = [-1,-2 , 0, 1, 2]
 rdist = IIDSampler(n, rewards)
-sampled_problem = sample_problem_2(n, rdist=rdist)
+sampled_problem = sample_practice(n,rdist=rdist)
 print("Sampled problem:", sampled_problem)
 
 # Example usage

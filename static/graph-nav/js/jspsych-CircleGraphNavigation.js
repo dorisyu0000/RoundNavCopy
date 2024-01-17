@@ -61,12 +61,12 @@ export class CircleGraph {
     options.show_points = options.show_points ?? true
 
 
-    this.rewards = [...options.rewards] ?? Array(options.graph.length).fill(0)
+    this.rewards = [...options.rewards] ?? Array(options.graph.length).fill(null)
     this.onStateVisit = options.onStateVisit ?? ((s) => { })
     this.score = options.score ?? 0
 
     if (options.consume) {
-      this.rewards[options.start] = 0
+      this.rewards[options.start] = null
     }
     options.emojiGraphics[0] = options.emojiGraphics[0] ?? ""
     options.graphics = this.rewards.map(x => options.emojiGraphics[x])
@@ -160,7 +160,7 @@ export class CircleGraph {
   setupLogging() {
     this.data = {
       events: [],
-      trial: _.pick(this.options, 'graph', 'n_steps', 'rewards', 'start', 'hover_edges', 'hover_rewards')
+      trial: _.pick(this.options, 'graph', 'n_steps', 'rewards', 'start', 'hover_edges', 'hover_rewards','trialNumber','bonus'),
     }
     let start_time = Date.now()
     this.logger = function (event, info = {}) {
@@ -378,19 +378,23 @@ export class CircleGraph {
   }
 
   async addScore(points, state) {
-    if (points == 0) {
+
+    if (points == null) {
       return
     }
+
     this.setScore(this.score + points)
-    let cls = (points < 0) ? "loss" : "win"
-    let sign = (points < 0) ? "" : "+"
+
+    let cls = {
+      "-1": "loss",
+      "0": "neutral",
+      "1": "win"
+    }[Math.sign(points)]
+    let plus = (points < 0) ? "" : "+"
     let pop = $("<span>")
       .addClass('pop ' + cls)
-      .text(sign + points)
+      .text(plus + points)
       .appendTo($(`.GraphNavigation-ShadowState-${state}`))
-
-    await sleep(1500)
-    pop.remove()
   }
 
   setScore(score) {
@@ -399,6 +403,7 @@ export class CircleGraph {
   }
 
   visitState(state, initial = false) {
+    
     invariant(typeof (1) == 'number')
     this.logger('visit', { state, initial })
 
@@ -820,7 +825,13 @@ function renderKeyInstruction(keys) {
 addPlugin('main', trialErrorHandling(async function main(root, trial) {
   trial.n_steps = -1;
   cg = new CircleGraph($(root), trial);
-  await cg.showStartScreen(trial)
+  if (trial.trialNumber % 10 === 0) {
+    await cg.showStartScreen(trial);
+  }
+  else {
+    await cg.showGraph();
+  }
+  
   await cg.navigate()
   trial.bonus.addPoints(cg.score)
   cg.data.current_bonus = trial.bonus.dollars()

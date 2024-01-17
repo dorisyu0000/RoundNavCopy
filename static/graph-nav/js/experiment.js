@@ -42,6 +42,7 @@ async function initializeExperiment() {
     "rewards":[5,5,5,5,5,5,5,5],
     "start":0,
     "n_steps":-1
+
   }
 
   window.config = config
@@ -114,12 +115,10 @@ async function initializeExperiment() {
     // instruct_block('test'),
     instruct_block('intro'),
     instruct_block('collect_all'),
-    // instruct_block('learn_rewards'),
-    // practice_block('move2',`
-    //   In the real game, you get to move more than once. The number of moves
-    //   for the current round is shown after you click the start button. Give
-    //   it a shot!
-    // `),
+    instruct_block('learn_rewards'),
+
+    instruct_block('practice'),
+
     // instruct_block('backstep'),
     // practice_block('practice_revealed', `
     //   Let's try a few practice rounds with more moves.

@@ -173,23 +173,26 @@ addPlugin('learn_rewards', async function learn_rewards(root, info) {
       trial = {...info, ...trial, show_steps: false}
       cg = new CircleGraph($("#cgi-root"), trial);
       let best = _.max(cg.graph.successors(cg.options.start).map(s => cg.rewards[s]))
-
+      
       await cg.showGraph()
       await cg.navigate()
       n_correct += (cg.score == best)
-
+      console.log('cg.score', cg.score, best)
       $(cg.wrapper).remove()
       cg.data.trial_type = 'learn_rewards'
       jsPsych.data.write(cg.data);
       psiturk.recordTrialData(cg.data)
     }
-    if (n_correct == trial_set.length) {
+    console.log('n_correct', n_correct)
+
+    if (n_correct >= trial_set.length-2) {
       message(`Great job! It looks like you've figured out which items are best.`)
       await button()
       jsPsych.finishTrial({'trial_type': 'dummy', 'flag': 'dummy'})
       return
     }
   }
+  
   // exhausted all the trial sets!
   message(`
     <b>It seems like you are having a hard time understanding the game.
@@ -199,17 +202,24 @@ addPlugin('learn_rewards', async function learn_rewards(root, info) {
   $('#cgi-msg').css('margin-top', 200)
 })
 
+
 addPlugin('practice', async function practice(root, trial) {
   setup(root)
-  message(trial.message)
+  message(`
+  In the real game, you get to move twice. Give
+  it a shot! Try to get to the highest goal state.
+`)
   // if (trial.first) await button()
 
   cg = new CircleGraph($("#cgi-root"), trial);
-  await cg.showStartScreen(trial)
+  // await cg.showStartScreen(trial)
+  await cg.showGraph()
   await cg.navigate()
   $(root).empty()
   jsPsych.finishTrial(cg.data)
 })
+
+
 
 addPlugin('backstep', async function backstep(root, trial) {
   setup(root)
@@ -370,7 +380,7 @@ addPlugin('text', async function text(root, trial) {
 let ensureSign = x => x > 0 ? "+" + x : "" + x
 
 function describeRewards(emojiGraphics) {
-  let vals = _.sortBy(_.without(_.keys(emojiGraphics), "0"), parseFloat);
+  let vals = _.sortBy(_.without(_.keys(emojiGraphics), "null"), parseFloat);
   let vv = vals.map(reward => `
     <div class="describe-rewards-box">
       ${renderSmallEmoji(emojiGraphics[reward])}

@@ -19,7 +19,7 @@
     transform: scale(0.8);
   }
   100% {
-    transform: scale(1)
+    transform: scale(1);
     opacity: 1;
   }
 }
@@ -42,6 +42,9 @@
 }
 .win {
   color: #0F7003;
+}
+.neutral {
+  color: #8E8E8E;
 }
 
 @keyframes zoomup {
@@ -364,18 +367,13 @@
 
 /*describe the reward */
 
-.describe-rewards-box {
-  display: flex;
-  flex-direction: column; /* Stack items vertically */
-  align-items: center; /* Center items horizontally */
-  margin: 0 10px; /* Add space between each box */
+.describe-rewards-horizontal {
+  display: flex; /* Use flexbox to lay out children in a row */
+  justify-content: center; /* Center the children horizontally */
+  align-items: center; /* Center the children vertically */
+  flex-wrap: wrap; /* Allow items to wrap onto multiple lines if needed */
+  gap: 10px; /* Add some space between items */
 }
-
-.reward-value {
-  text-align: center;
-  margin-top: 5px; /* Add some space between the image and the score */
-}
-
 
 
 /* The timer */
