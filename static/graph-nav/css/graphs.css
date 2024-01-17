@@ -121,6 +121,7 @@
 .GraphNavigation-State.State {
   border-width: 0;
 
+
   z-index: 3;
   position: absolute;
 
@@ -246,6 +247,8 @@
   transition: background-color 300ms;
   margin: 1rem;
   user-select: none;
+  /* overflow: hidden; */
+
 }
 
 .GraphNavigation .State > img {
@@ -358,6 +361,22 @@
 .legal hr {
  border-color: #ccc;
 }
+
+/*describe the reward */
+
+.describe-rewards-box {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items horizontally */
+  margin: 0 10px; /* Add space between each box */
+}
+
+.reward-value {
+  text-align: center;
+  margin-top: 5px; /* Add some space between the image and the score */
+}
+
+
 
 /* The timer */
 

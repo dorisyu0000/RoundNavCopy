@@ -5,7 +5,8 @@ import $ from '../../lib/jquery-min.js';
 import jsPsych from '../../lib/jspsych-exported.js';
 
 const stateTemplate = (state, graphic, cls) => `
-<div class="State ${cls}" data-state="${state}"><img src="${graphicsUrl(graphic)}" /></div>
+<div class="State ${cls}" data-state="${state}">      <img src="${graphicsUrl(graphic)}" alt="Circle Graphic" style="width: 70px; height: 70px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);max-width: 100%; max-height: 100%;border-radius: 50%;"/>
+</div>
 `;
 
 function render(graph, gfx, state, goal) {

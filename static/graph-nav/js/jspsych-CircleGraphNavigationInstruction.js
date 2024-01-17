@@ -76,12 +76,12 @@ addPlugin('intro', async function intro(root, trial) {
   `)
   let goal = _.sample(cg.graph.successors(cg.state))
   // $("#gn-points").show()
-  cg.setReward(goal, 10)
+  cg.setReward(goal, 1)
   console.log('goal', goal)
   await cg.navigate({n_steps: -1, goal, leave_state: true})
 
   message(`
-    Nice! You got 10 points for collecting that item.
+    Nice! You got 1 points for collecting that item.
   `)
   await button()
 
@@ -97,10 +97,10 @@ addPlugin('intro', async function intro(root, trial) {
   `)
 
   goal = _.sample(cg.graph.successors(cg.state))
-  cg.setReward(goal, -5)
+  cg.setReward(goal, -1)
   await cg.navigate({n_steps: -1, goal, leave_open: true})
 
-  message(`<i>Ouch!</i> You lost 5 points for collecting that one!`)
+  message(`<i>Ouch!</i> You lost 1 points for collecting that one!`)
   cg.removeGraph()
   await button()
 
@@ -370,23 +370,22 @@ addPlugin('text', async function text(root, trial) {
 let ensureSign = x => x > 0 ? "+" + x : "" + x
 
 function describeRewards(emojiGraphics) {
-  let vals = _.sortBy(_.without(_.keys(emojiGraphics), "0"), parseFloat)
-  // let descriptions = vals.map(reward => {
-  //   return `${renderSmallEmoji(emojiGraphics[reward])}is worth ${reward}`
-  // })
-  // return descriptions.slice(0, -1).join(', ') + ', and ' + descriptions.slice(-1)
-  let vv =  vals.map(reward => `
+  let vals = _.sortBy(_.without(_.keys(emojiGraphics), "0"), parseFloat);
+  let vv = vals.map(reward => `
     <div class="describe-rewards-box">
-    ${renderSmallEmoji(emojiGraphics[reward])}
-    ${ensureSign(reward)}
+      ${renderSmallEmoji(emojiGraphics[reward])}
+      <div class="reward-value">${ensureSign(reward)}</div>
     </div>
-  `).join("")
+  `).join("");
+
   return `
-    <div class="describe-rewards">
+    <div class="describe-rewards-horizontal">
       ${vv}
     </div>
-  `
+  `;
 }
+
+
 
 
 function describeActions() {
@@ -397,4 +396,3 @@ function describeActions() {
     </div>
   `
 }
-

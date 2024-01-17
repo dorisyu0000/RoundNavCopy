@@ -218,6 +218,8 @@ export class CircleGraph {
   async getKeyResponse() {
     return new Promise((resolve) => {
         const keyHandler = (info) => {
+
+
           const input_key = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(info.key);
           let key; // Declare the 'key' variable
           if (input_key == 'q' || input_key == '1') {
@@ -237,7 +239,7 @@ export class CircleGraph {
                     const selectedState = validSuccessors[index];
                     resolve({ state: selectedState });
                 } else {
-                    this.showToast("Invalid selection: not a valid successor.");
+                    // this.showToast("Invalid selection: not a valid successor.");
                 }
             }
         };
@@ -493,7 +495,8 @@ export class CircleGraph {
     this.rewards[state] = parseFloat(reward)
     let graphic = this.options.emojiGraphics[reward]
     $(`.GraphNavigation-State-${state}`).html(`
-      <img src="${graphicsUrl(graphic)}" />
+            <img src="${graphicsUrl(graphic)}" alt="Circle Graphic" style="width: 70px; height: 70px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);max-width: 100%; max-height: 100%;border-radius: 50%;"/>
+
     `)
   }
 
@@ -506,6 +509,7 @@ export class CircleGraph {
 
 
 const stateTemplate = (state, graphic, options) => {
+
   let cls = `GraphNavigation-State-${state}`;
   if (options.goal) {
     cls += ' GraphNavigation-goal';
@@ -514,13 +518,16 @@ const stateTemplate = (state, graphic, options) => {
     cls += ' GraphNavigation-probe';
   }
   return `
+  
   <div class="State GraphNavigation-State ${cls || ''}" style="${options.style || ''}" data-state="${state}">
-    <img src="${graphicsUrl(graphic)}" />
+
+  <img src="${graphicsUrl(graphic)}" alt="Circle Graphic" style="width: 70px; height: 70px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);max-width: 100%; max-height: 100%;border-radius: 50%;"/>
   </div>
   `;
 };
 
 export const renderSmallEmoji = (graphic, cls) => `
+
 <img style="height:40px" src="${graphicsUrl(graphic)}" />
 `;
 
